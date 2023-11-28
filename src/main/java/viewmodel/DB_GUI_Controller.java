@@ -26,9 +26,12 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DB_GUI_Controller implements Initializable {
-
+    //RFC 54322 standard
+    Pattern EMAILFORMAT = Pattern.compile("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
     @FXML
     TextField first_name, last_name, department, email, imageURL;
     @FXML
@@ -46,7 +49,7 @@ public class DB_GUI_Controller implements Initializable {
     private final DbConnectivityClass cnUtil = new DbConnectivityClass();
     private final ObservableList<Person> data = cnUtil.getData();
     @FXML
-    private Button editButton, deleteButton;
+    private Button editButton, deleteButton,addBtn;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -61,6 +64,8 @@ public class DB_GUI_Controller implements Initializable {
             tv.setItems(data);
             editButton.disableProperty().bind(tv.getSelectionModel().selectedItemProperty().isNull());
             deleteButton.disableProperty().bind(tv.getSelectionModel().selectedItemProperty().isNull());
+            addBtn.setDisable(true);
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -165,7 +170,15 @@ public class DB_GUI_Controller implements Initializable {
         email.setText(p.getEmail());
         imageURL.setText(p.getImageURL());
     }
-
+    //important text boxes will call this when typed in
+    @FXML
+    private void isDataValid(){
+        Matcher ev = EMAILFORMAT.matcher(email.getText());
+     if (ev.matches()){
+        addBtn.setDisable(false);}else {
+         addBtn.setDisable(true);
+     }
+    }
     public void lightTheme(ActionEvent actionEvent) {
         try {
             Scene scene = menuBar.getScene();
