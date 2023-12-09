@@ -48,6 +48,50 @@ public class DbConnectivityClass {
             return data;
         }
 
+        public boolean checkCredentials(String userName, String password){
+         connectToUserDatabase();
+         queryUserSession(userName);
+         return false;
+        }
+
+        private boolean connectToUserDatabase(){
+            boolean hasRegistredUserSessions = false;
+
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Connection conn = DriverManager.getConnection(SQL_SERVER_URL, USERNAME, PASSWORD);
+                Statement statement = conn.createStatement();
+                statement.executeUpdate("CREATE DATABASE IF NOT EXISTS "+DB_NAME+"");
+                statement.close();
+                conn.close();
+                conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+                statement = conn.createStatement();
+                String sql = "CREATE TABLE IF NOT EXISTS userSessions (" + "id INT( 10 ) NOT NULL PRIMARY KEY AUTO_INCREMENT,"
+                        + "userName VARCHAR(200),"
+                        + "password VARCHAR(200),"
+                        + "admin VARCHAR(200))";
+                statement.executeUpdate(sql);
+
+
+                statement = conn.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM users");
+
+                if (resultSet.next()) {
+                    int numUsers = resultSet.getInt(1);
+                    if (numUsers > 0) {
+                        hasRegistredUserSessions = true;
+                    }
+                }
+
+                statement.close();
+                conn.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return hasRegistredUserSessions;
+        }
 
         public boolean connectToDatabase() {
             boolean hasRegistredUsers = false;
@@ -120,6 +164,33 @@ public class DbConnectivityClass {
                 e.printStackTrace();
             }
         }
+
+        //for checking login credentials
+    public void queryUserSession(String userName) {
+        connectToDatabase();
+        try {
+            Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+            String sql = "SELECT * FROM userSessions WHERE userName = ?";
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setString(1, userName);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String user = resultSet.getString("userName");
+                String password = resultSet.getString("password");
+                String admin = resultSet.getString("admin");
+
+                lg.makeLog("ID: " + id + ", Name: " + user + " password" + password + " "
+                        + ", Privillages: " + admin);
+            }
+            preparedStatement.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
         public void listAllUsers() {
             connectToDatabase();

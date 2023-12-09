@@ -45,7 +45,7 @@ public class DB_GUI_Controller implements Initializable {
     @FXML
     private TableColumn<Person, Integer> tv_id;
     @FXML
-    private TableColumn<Person, String> tv_fn, tv_ln, tv_department, tv_major, tv_email;
+    private TableColumn<Person, String> tv_fn, tv_ln, tv_department  , tv_major, tv_email;
     private final DbConnectivityClass cnUtil = new DbConnectivityClass();
     private final ObservableList<Person> data = cnUtil.getData();
     @FXML
