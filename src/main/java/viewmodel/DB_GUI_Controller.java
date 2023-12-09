@@ -64,7 +64,7 @@ public class DB_GUI_Controller implements Initializable {
             tv.setItems(data);
             editButton.disableProperty().bind(tv.getSelectionModel().selectedItemProperty().isNull());
             deleteButton.disableProperty().bind(tv.getSelectionModel().selectedItemProperty().isNull());
-            addBtn.setDisable(true);
+            addBtn.setDisable(false);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -163,12 +163,14 @@ public class DB_GUI_Controller implements Initializable {
     @FXML
     protected void selectedItemTV(MouseEvent mouseEvent) {
         Person p = tv.getSelectionModel().getSelectedItem();
+        //check if empty collum selected
+        if(p!=null){
         first_name.setText(p.getFirstName());
         last_name.setText(p.getLastName());
         department.setText(p.getDepartment());
         major.setValue(p.getMajor());
         email.setText(p.getEmail());
-        imageURL.setText(p.getImageURL());
+        imageURL.setText(p.getImageURL());}
     }
     //important text boxes will call this when typed in
     @FXML
